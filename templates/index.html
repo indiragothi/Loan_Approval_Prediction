@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Approval Prediction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #1cc88a;
+            --danger-color: #e74a3b;
+            --dark-color: #5a5c69;
+            --light-color: #f8f9fc;
+        }
+        
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            padding: 30px 0;
+        }
+        
+        .container {
+            max-width: 900px;
+            background-color: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e3e6f0;
+        }
+        
+        .header h1 {
+            color: var(--dark-color);
+            font-weight: 700;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            color: #858796;
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 8px;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 1px solid #d1d3e2;
+            font-size: 15px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eaecf4;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 12px 20px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2e59d9;
+            border-color: #2e59d9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
+        }
+        
+        .prediction-result {
+            margin-top: 35px;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .approved {
+            background-color: rgba(28, 200, 138, 0.15);
+            color: var(--secondary-color);
+            border: 1px solid rgba(28, 200, 138, 0.3);
+        }
+        
+        .rejected {
+            background-color: rgba(231, 74, 59, 0.15);
+            color: var(--danger-color);
+            border: 1px solid rgba(231, 74, 59, 0.3);
+        }
+        
+        .card {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px 10px 0 0 !important;
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+
+        .form-icon {
+            position: absolute;
+            right: 25px;
+            top: 44px;
+            color: #d1d3e2;
+        }
+        
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .btn-submit {
+            margin-top: 20px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #858796;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-landmark me-2"></i>Loan Approval Prediction</h1>
+            <p class="text-muted">Enter applicant details to check loan eligibility</p>
+        </div>
+
+        <form action="/predict" method="post">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-user me-2"></i>Personal Information
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select name="gender" id="gender" class="form-select" required>
+                                    <option value="1">Male</option>
+                                    <option value="0">Female</option>
+                                </select>
+                                <div class="form-icon">
+                                    <i class="fas fa-venus-mars"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="married" class="form-label">Marital Status</label>
+                                <select name="married" id="married" class="form-select" required>
+                                    <option value="1">Married</option>
+                                    <option value="0">Single</option>
+                                </select>
+                                <div class="form-icon">
+                                    <i class="fas fa-ring"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="dependents" class="form-label">Dependents</label>
+                                <select name="dependents" id="dependents" class="form-select" required>
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3+</option>
+                                </select>
+                                <div class="form-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="education" class="form-label">Education</label>
+                                <select name="education" id="education" class="form-select" required>
+                                    <option value="1">Graduate</option>
+                                    <option value="0">Not Graduate</option>
+                                </select>
+                                <div class="form-icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="self_employed" class="form-label">Self-Employed</label>
+                                <select name="self_employed" id="self_employed" class="form-select" required>
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                                <div class="form-icon">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-money-bill-wave me-2"></i>Financial Information
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="applicant_income" class="form-label">Applicant Income</label>
+                                <input type="number" class="form-control" id="applicant_income" name="applicant_income" step="0.01" required>
+                                <div class="form-icon">
+                                    <i class="fas fa-rupee-sign"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="coapplicant_income" class="form-label">Co-applicant Income</label>
+                                <input type="number" class="form-control" id="coapplicant_income" name="coapplicant_income" step="0.01" required>
+                                <div class="form-icon">
+                                    <i class="fas fa-rupee-sign"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="credit_history" class="form-label">Credit History</label>
+                                <select name="credit_history" id="credit_history" class="form-select" required>
+                                    <option value="1">Good</option>
+                                    <option value="0">Bad</option>
+                                </select>
+                                <div class="form-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-home me-2"></i>Loan & Property Details
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="loan_amount" class="form-label">Loan Amount</label>
+                                <input type="number" class="form-control" id="loan_amount" name="loan_amount" step="0.01" required>
+                                <div class="form-icon">
+                                    <i class="fas fa-rupee-sign"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="term" class="form-label">Loan Term (months)</label>
+                                <input type="number" class="form-control" id="term" name="term" min="0" step="1" required>
+                                <div class="form-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="area" class="form-label">Property Area</label>
+                                <select name="area" id="area" class="form-select" required>
+                                    <option value="0">Rural</option>
+                                    <option value="1">Semiurban</option>
+                                    <option value="2">Urban</option>
+                                </select>
+                                <div class="form-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid btn-submit">
+                <button class="btn btn-primary btn-lg" type="submit">
+                    <i class="fas fa-check-circle me-2"></i>Check Loan Eligibility
+                </button>
+            </div>
+        </form>
+
+        {% if prediction_text %}
+        <div class="prediction-result {% if 'Approved' in prediction_text %}approved{% else %}rejected{% endif %}">
+            <i class="fas {% if 'Approved' in prediction_text %}fa-check-circle{% else %}fa-times-circle{% endif %} me-2"></i>
+            {{ prediction_text }}
+        </div>
+        {% endif %}
+
+        <div class="footer">
+            <p>Loan Approval Prediction System © 2025</p>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

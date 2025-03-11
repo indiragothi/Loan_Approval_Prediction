@@ -1,0 +1,10 @@
+Flask
+scikit-learn
+pandas
+numpy
+matplotlib
+seaborn
+plotly
+xgboost
+nbformat>=4.2.0
+joblib
